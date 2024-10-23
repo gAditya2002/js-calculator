@@ -1,8 +1,8 @@
-document.querySelectorAll(".num").forEach(button => {
+document.querySelectorAll(".num").forEach((button) => {
   button.addEventListener("click", handleNumberClick);
 });
 
-document.querySelectorAll(".op").forEach(button => {
+document.querySelectorAll(".op").forEach((button) => {
   button.addEventListener("click", handleOperatorClick);
 });
 
@@ -20,13 +20,12 @@ function handleNumberClick(e) {
   const clickedNumber = e.target.innerText;
   if (clickedNumber === "." && currentInput.includes(".")) return;
 
-  currentInput += clickedNumber; 
+  currentInput += clickedNumber;
   updateDisplay();
 }
 
 function handleOperatorClick(e) {
   const operator = e.target.innerText;
-
 
   if (currentInput === "") {
     if (operator === "-") {
@@ -36,13 +35,11 @@ function handleOperatorClick(e) {
     return;
   }
 
-
   if (currentInput === "-" && ["+", "*", "/", "×", "÷"].includes(operator)) {
     return;
   }
 
   const lastChar = currentInput.trim().slice(-1);
-
 
   if (["+", "-", "×", "÷", "*"].includes(lastChar)) {
     currentInput = currentInput.trim().slice(0, -1) + ` ${operator} `;
@@ -53,11 +50,9 @@ function handleOperatorClick(e) {
   updateDisplay();
 }
 
-
 function calculate() {
   const expression = currentInput.replace(/×/g, "*").replace(/÷/g, "/");
-  const tokens = expression.split(" ").filter(token => token.trim() !== "");
-
+  const tokens = expression.split(" ").filter((token) => token.trim() !== "");
 
   let result = parseFloat(tokens[0]);
 
@@ -66,7 +61,7 @@ function calculate() {
     const nextNumber = parseFloat(tokens[i + 1]);
 
     if (isNaN(nextNumber)) {
-      return; 
+      return;
     }
 
     switch (operator) {
@@ -81,21 +76,20 @@ function calculate() {
         break;
       case "/":
         if (nextNumber === 0) {
-          return; 
+          return;
         }
         result /= nextNumber;
         break;
       default:
-        return; 
+        return;
     }
   }
 
-  currentInput = result.toString(); 
-  updateDisplay(); 
+  currentInput = result.toString();
+  updateDisplay();
 }
-
 
 function clearInput() {
   currentInput = "";
-  updateDisplay(); 
+  updateDisplay();
 }
