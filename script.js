@@ -65,7 +65,7 @@ function handleOperatorClick(e) {
 
 function calculate() {
   const expression = currentInput.replace(/×/g, "*").replace(/÷/g, "/");
-  
+
   const tokens = expression.split(" ").filter((token) => token.trim() !== "");
 
   let result = parseFloat(tokens[0]);
@@ -90,6 +90,9 @@ function calculate() {
         break;
       case "/":
         if (nextNumber === 0) {
+          console.log("nan")
+          currentInput = "infinity"
+          updateDisplay();
           return;
         }
         result /= nextNumber;
