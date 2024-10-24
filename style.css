@@ -10,7 +10,7 @@ section {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100vh; /* Full height to center on the screen */
+  height: 100vh; 
 }
 
 .main-container {
@@ -87,16 +87,15 @@ section {
   color: wheat;
 }
 
-input {
-  overflow-wrap: break-word;
-  border: 2px solid #ccc;
-
+.input {
+  padding: 5px;
   width: 100%;
-  height: 10vh;
-  font-size: 2rem;
+  font-size: 1.75rem; 
+  overflow-wrap: break-word; 
+  white-space: normal;
 }
 
-/* Responsive Styles */
+
 @media (max-width: 320px) {
   .main-container {
     width: 90%;

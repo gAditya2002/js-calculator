@@ -7,9 +7,11 @@ document.querySelectorAll(".op").forEach((button) => {
 });
 
 document.querySelector(".clear").addEventListener("click", clearInput);
+
 document.querySelector(".equal").addEventListener("click", calculate);
 
 let currentInput = "";
+
 const inputField = document.querySelector(".input");
 
 function updateDisplay() {
@@ -28,22 +30,33 @@ function handleOperatorClick(e) {
   const operator = e.target.innerText;
 
   if (currentInput === "") {
+
     if (operator === "-") {
+
       currentInput += operator;
       updateDisplay();
+
     }
+
     return;
+
   }
 
   if (currentInput === "-" && ["+", "*", "/", "×", "÷"].includes(operator)) {
+
     return;
+
   }
 
   const lastChar = currentInput.trim().slice(-1);
 
   if (["+", "-", "×", "÷", "*"].includes(lastChar)) {
-    currentInput = currentInput.trim().slice(0, -1) + ` ${operator} `;
-  } else {
+
+    currentInput = currentInput.trim().slice(0, -1) + `${operator} `;
+
+  }
+   else 
+   {
     currentInput += ` ${operator} `;
   }
 
@@ -52,6 +65,7 @@ function handleOperatorClick(e) {
 
 function calculate() {
   const expression = currentInput.replace(/×/g, "*").replace(/÷/g, "/");
+  
   const tokens = expression.split(" ").filter((token) => token.trim() !== "");
 
   let result = parseFloat(tokens[0]);
