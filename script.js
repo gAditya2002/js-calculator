@@ -21,8 +21,9 @@ function updateDisplay() {
 
 function handleNumberClick(e) {
   const clickedNumber = e.target.innerText;
+  const lastNumber = currentInput.trim().split(" ").pop(); 
 
-  if (clickedNumber === "." && currentInput.includes(".")) return;
+  if (clickedNumber === "." && lastNumber.includes(".")) return;
 
   currentInput += clickedNumber;
   updateDisplay();
@@ -30,11 +31,9 @@ function handleNumberClick(e) {
 
 function handleOperatorClick(e) {
   const operator = e.target.innerText;
-
   if (currentInput === "infinite") {
     currentInput = "";
   }
-
   if (currentInput === "") {
     if (operator === "-") {
       currentInput += operator;
@@ -42,93 +41,104 @@ function handleOperatorClick(e) {
     }
     return;
   }
-
   if (currentInput === "-" && ["+", "*", "/", "×", "÷"].includes(operator)) {
     return;
   }
 
   const lastChar = currentInput.trim().slice(-1);
 
-  if (["+", "-", "×", "÷", "*"].includes(lastChar)) {
+  if (["+", "-", "×", "÷", "*","."].includes(lastChar)) {
     currentInput = currentInput.trim().slice(0, -1) + `${operator} `;
   } else {
     currentInput += ` ${operator} `;
   }
-
   updateDisplay();
 }
 
-
 function handleKeyPress(e) {
   const key = e.key;
-
   if (key === " ") {
     e.preventDefault();
     return;
   }
-
-
-  if (/^[a-zA-Z]$/.test(key)) {
-    e.preventDefault();
-    return;
-  }
-
-
-  if (!isNaN(key) || key === ".") {
+  if (!isNaN(key) || key === '.') { 
     e.preventDefault();
     handleNumberClick({ target: { innerText: key } });
-  }
-
-  
-
-  else if (["+", "-", "*", "/"].includes(key)) {
+  } else if (["+", "-", "*", "/"].includes(key)) {
     e.preventDefault();
     handleOperatorClick({ target: { innerText: key } });
-  }
-
-  
-
-  else if (key === "Enter") {
+  } else if (key === "Enter") {
     e.preventDefault();
     calculate();
-  }
-
-  else if (key === "Backspace") {
+  } else if (key === "Backspace") {
     e.preventDefault();
     if (currentInput.length > 0) {
       currentInput = currentInput.slice(0, -1);
       updateDisplay();
     }
-  }
-
-  else if (key === "Escape") {
-    clearInput();
+  } else {
+    e.preventDefault();
   }
 }
-
-
-
 
 function calculate() {
   if (currentInput === "" || currentInput === "infinite") {
     return;
   }
 
-  const lastChar = currentInput.slice(-1);
+  currentInput = currentInput.trim();
+  while (["+", "-", "*", "/", "×", "÷"].includes(currentInput.slice(-1))) {
+    currentInput = currentInput.slice(0, -1).trim();
+  }
 
-  if (["+", "-", "*", "/", "×", "÷"].includes(lastChar)) {
+  const expression = currentInput.replace(/×/g, "*").replace(/÷/g, "/");
+
+  if (expression === "" || /[^\d\s\+\-\*\/\.]/.test(expression)) {
     currentInput = " ";
     updateDisplay();
     return;
   }
 
-  const expression = currentInput.replace(/×/g, "*").replace(/÷/g, "/");
-  const tokens = expression.split(" ").filter((token) => token.trim() !== "");
-  let result = parseFloat(tokens[0]);
+  const result = evaluateExpression(expression);
+  currentInput = result.toString();
+  updateDisplay();
+}
 
-  for (let i = 1; i < tokens.length; i += 2) {
-    const operator = tokens[i];
-    const nextNumber = parseFloat(tokens[i + 1]);
+function evaluateExpression(expr) {
+  if (expr.startsWith("-")) {
+    expr = "0 " + expr;  
+  }
+
+  const tokens = expr.match(/(\d+\.?\d*|\+|\-|\*|\/|\s+)/g).map(token => token.trim()).filter(token => token.length);
+
+  let tempResult = [];
+  let i = 0;
+  while (i < tokens.length) {
+    if (tokens[i] === "*" || tokens[i] === "/") {
+      const left = parseFloat(tempResult.pop());
+      const right = parseFloat(tokens[i + 1]);
+      const operator = tokens[i];
+
+      if (operator === "/" && right === 0) {
+        currentInput = "infinite";          
+        updateDisplay();
+        currentInput = " ";
+        return;
+      }
+
+      const newValue = operator === "*" ? left * right : left / right;
+      tempResult.push(newValue);
+      i += 2; 
+    } else {
+      tempResult.push(tokens[i]);
+      i++;
+    }
+  }
+
+  let finalResult = parseFloat(tempResult[0]);
+  for (let j = 1; j < tempResult.length; j += 2) {
+    const operator = tempResult[j];
+    const nextNumber = parseFloat(tempResult[j + 1]);
 
     if (isNaN(nextNumber)) {
       currentInput = " ";
@@ -138,31 +148,17 @@ function calculate() {
 
     switch (operator) {
       case "+":
-        result += nextNumber;
+        finalResult += nextNumber;
         break;
       case "-":
-        result -= nextNumber;
-        break;
-      case "*":
-        result *= nextNumber;
-        break;
-      case "/":
-        if (nextNumber === 0) {
-          currentInput = "infinite";
-          updateDisplay();
-          equalButton.disabled = true;
-          currentInput = "";
-          return;
-        }
-        result /= nextNumber;
+        finalResult -= nextNumber;
         break;
       default:
         return;
     }
   }
 
-  currentInput = result.toString();
-  updateDisplay();
+  return finalResult;
 }
 
 function clearInput() {
