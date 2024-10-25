@@ -21,7 +21,7 @@ function updateDisplay() {
 
 function handleNumberClick(e) {
   const clickedNumber = e.target.innerText;
-  const lastNumber = currentInput.trim().split(" ").pop(); 
+  const lastNumber = currentInput.trim().split(" ").pop();
 
   if (clickedNumber === "." && lastNumber.includes(".")) return;
 
@@ -47,7 +47,7 @@ function handleOperatorClick(e) {
 
   const lastChar = currentInput.trim().slice(-1);
 
-  if (["+", "-", "×", "÷", "*","."].includes(lastChar)) {
+  if (["+", "-", "×", "÷", "*", "."].includes(lastChar)) {
     currentInput = currentInput.trim().slice(0, -1) + `${operator} `;
   } else {
     currentInput += ` ${operator} `;
@@ -61,7 +61,7 @@ function handleKeyPress(e) {
     e.preventDefault();
     return;
   }
-  if (!isNaN(key) || key === '.') { 
+  if (!isNaN(key) || key === ".") {
     e.preventDefault();
     handleNumberClick({ target: { innerText: key } });
   } else if (["+", "-", "*", "/"].includes(key)) {
@@ -106,10 +106,13 @@ function calculate() {
 
 function evaluateExpression(expr) {
   if (expr.startsWith("-")) {
-    expr = "0 " + expr;  
+    expr = "0 " + expr;
   }
 
-  const tokens = expr.match(/(\d+\.?\d*|\+|\-|\*|\/|\s+)/g).map(token => token.trim()).filter(token => token.length);
+  const tokens = expr
+    .match(/(\d+\.?\d*|\+|\-|\*|\/|\s+)/g)
+    .map((token) => token.trim())
+    .filter((token) => token.length);
 
   let tempResult = [];
   let i = 0;
@@ -120,7 +123,7 @@ function evaluateExpression(expr) {
       const operator = tokens[i];
 
       if (operator === "/" && right === 0) {
-        currentInput = "infinite";          
+        currentInput = "infinite";
         updateDisplay();
         currentInput = " ";
         return;
@@ -128,7 +131,7 @@ function evaluateExpression(expr) {
 
       const newValue = operator === "*" ? left * right : left / right;
       tempResult.push(newValue);
-      i += 2; 
+      i += 2;
     } else {
       tempResult.push(tokens[i]);
       i++;
